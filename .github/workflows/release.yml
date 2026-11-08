@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the script
+        run: |
+          bash -n install-lightpanda-termux.sh
+          shellcheck -s bash install-lightpanda-termux.sh
+      - name: Checksum
+        run: sha256sum install-lightpanda-termux.sh > install-lightpanda-termux.sh.sha256
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: lightpanda-termux ${{ github.ref_name }}
+          prerelease: true
+          body: |
+            Installs the official Lightpanda 1.0.3 aarch64 build in Termux through glibc-runner.
+
+            Preview: tested against a mock Termux, not yet on a real phone.
+          files: |
+            install-lightpanda-termux.sh
+            install-lightpanda-termux.sh.sha256
